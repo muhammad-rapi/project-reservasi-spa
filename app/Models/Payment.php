@@ -16,8 +16,8 @@ class Payment extends Model
 
     // Payment Status
     const UNPAID = 'unpaid';
-    const PAID = 'lunas';
-    const PENDING = 'pending';
+    const PAID = 'Lunas';
+    const PENDING = 'Pending';
 
     protected static function boot()
     {

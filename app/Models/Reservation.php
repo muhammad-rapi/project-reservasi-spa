@@ -42,4 +42,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(Babyspa::class, 'baby_spa_id');
     }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

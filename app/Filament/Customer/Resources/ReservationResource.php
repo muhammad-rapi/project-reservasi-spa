@@ -92,8 +92,8 @@ class ReservationResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('paid')
                     ->label('Status')
-                    ->formatStateUsing(fn ($state) => $state ? 'Lunas' : 'Pending')
-                    ->color(fn ($state) => $state ? 'success' : 'warning')
+                    ->formatStateUsing(fn($state) => $state ? 'Lunas' : 'Pending')
+                    ->color(fn($state) => $state ? 'success' : 'warning')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -114,7 +114,8 @@ class ReservationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('Upload Bukti Pembayaran')
-                    ->form(fn ($record) => [
+                    ->hidden(fn($record): bool => $record->payment->bukti_pembayaran != null)
+                    ->form(fn($record) => [
                         Forms\Components\FileUpload::make('bukti_pembayaran')
                             ->label('Upload Bukti Pembayaran')
                             ->rules(['required', 'image', 'max:2048'])
@@ -136,26 +137,21 @@ class ReservationResource extends Resource
                         }
 
                         $payment->bukti_pembayaran = $data['bukti_pembayaran'];
-                        $payment->status = Payment::PAID;
+                        $payment->status = Payment::PENDING;
                         $payment->save();
-
-                        // Update the reservation status
-                        $record->paid = true;
-                        $record->save();
 
                         $recipient = auth()->user();
                         Notification::make()
-                            ->title('Pembayaran Berhasil')
-                            ->body('Anda berhasil melakukan Pembayaran')
+                            ->title('Upload Bukti Pembayaran Berhasil')
+                            ->body('Anda berhasil upload bukti Pembayaran')
                             ->success()
                             ->send()
                             ->sendToDatabase($recipient);
                     })
                     ->icon('heroicon-m-arrow-up-tray')
-                    ->iconPosition(IconPosition::Before)
-                    ->visible(fn ($record) => !$record->paid),
+                    ->iconPosition(IconPosition::Before),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => !$record->paid),
+                    ->visible(fn($record) => !$record->paid),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

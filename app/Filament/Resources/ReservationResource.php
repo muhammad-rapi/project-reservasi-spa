@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReservationResource\Pages;
+use App\Models\Payment;
 use Filament\Notifications\Notification;
 use App\Models\Reservation;
 use Filament\Forms;
@@ -56,7 +57,6 @@ class ReservationResource extends Resource
                 Tables\Columns\TextColumn::make('customer.fullname')
                     ->numeric()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('baby_spa.price')
                     ->label('Harga Treatment')
                     ->money('IDR', locale: 'id')
@@ -88,6 +88,49 @@ class ReservationResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('Approve')
+                    ->hidden(fn($record): bool => $record->payment->status === Payment::PAID)
+                    ->form(fn($record) => [
+                        Forms\Components\TextInput::make('status')
+                            ->label('Status Pembayaran'),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Metode Pembayaran'),
+                        Forms\Components\FileUpload::make('bukti_pembayaran')
+                            ->label('Bukti Pembayaran'),
+                    ])
+                    ->fillForm(fn($record): array => [
+                        'status' => $record->payment->status,
+                        'name' => $record->payment->name,
+                        'bukti_pembayaran' => $record->payment->bukti_pembayaran,
+                    ])
+                    ->disabledForm()
+                    ->color('warning')
+                    ->action(function (array $data, $record): void {
+                        // Save the uploaded file
+                        $payment = Payment::where('reservation_id', $record->id)->first();
+
+                        if (!$payment) {
+                            $payment = new Payment();
+                            $payment->reservation_id = $record->id;
+                        }
+
+                        $payment->bukti_pembayaran = $data['bukti_pembayaran'];
+                        $payment->status = Payment::PAID;
+                        $payment->save();
+
+                        $record->paid = true;
+                        $record->save();
+
+                        $recipient = auth()->user();
+                        Notification::make()
+                            ->title('Approve Pembayaran Berhasil')
+                            ->body('Anda berhasil approve Pembayaran')
+                            ->success()
+                            ->send()
+                            ->sendToDatabase($recipient);
+                    })
+                    ->icon('heroicon-m-arrow-up-tray')
+                    ->iconPosition(IconPosition::Before),
                 Tables\Actions\DeleteAction::make()
                     ->visible(function ($record) {
                         return !$record->paid;
@@ -108,18 +151,18 @@ class ReservationResource extends Resource
                     ->schema([
                         Components\Split::make([
                             Components\Grid::make(2)
-                                ->schema(fn ($record) => [
+                                ->schema(fn($record) => [
                                     Components\Group::make([
                                         TextEntry::make('reservasi_date'),
                                         TextEntry::make('baby_name')
                                             ->label('Nama Bayi')
-                                            ->visible(fn ($record) => $record->baby_spa->jenis == 'Anak'),
+                                            ->visible(fn($record) => $record->baby_spa->jenis == 'Anak'),
                                         TextEntry::make('baby_weight')
                                             ->label('Berat Bayi')
-                                            ->visible(fn ($record) => $record->baby_spa->jenis == 'Anak'),
+                                            ->visible(fn($record) => $record->baby_spa->jenis == 'Anak'),
                                         TextEntry::make('baby_ages')
                                             ->label('Umur Bayi')
-                                            ->visible(fn ($record) => $record->baby_spa->jenis == 'Anak'),
+                                            ->visible(fn($record) => $record->baby_spa->jenis == 'Anak'),
                                     ]),
                                     Components\Group::make([
                                         TextEntry::make('baby_spa.spa_type')
