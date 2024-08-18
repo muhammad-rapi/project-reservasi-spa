@@ -106,7 +106,6 @@ class ReservationResource extends Resource
                     ->disabledForm()
                     ->color('warning')
                     ->action(function (array $data, $record): void {
-                        // Save the uploaded file
                         $payment = Payment::where('reservation_id', $record->id)->first();
 
                         if (!$payment) {

@@ -63,7 +63,7 @@ class TreatmentResource extends Resource
                         Stack::make([
                             TextColumn::make('spa_type')
                                 ->weight(FontWeight::Bold)
-                                ->description(fn ($record) => $record->jenis)
+                                ->description(fn($record) => $record->jenis)
                                 ->label('Jenis Spa')
                                 ->searchable(),
                             TextColumn::make('manfaat')
@@ -94,16 +94,16 @@ class TreatmentResource extends Resource
                     ->steps([
                         Step::make('Masukkan Data Reservasi')
                             ->description('Lengkapi Data Reservasi Anda')
-                            ->schema(fn ($record) => [
+                            ->schema(fn($record) => [
                                 Hidden::make('baby_spa_id')
                                     ->default($record->id),
                                 Forms\Components\Group::make([
                                     Forms\Components\TextInput::make('baby_name')
-                                        ->visible(fn ($record) => $record->jenis == 'Anak'),
+                                        ->visible(fn($record) => $record->jenis == 'Anak'),
                                     Forms\Components\TextInput::make('baby_weight')
-                                        ->visible(fn ($record) => $record->jenis == 'Anak'),
+                                        ->visible(fn($record) => $record->jenis == 'Anak'),
                                     Forms\Components\TextInput::make('baby_ages')
-                                        ->visible(fn ($record) => $record->jenis == 'Anak'),
+                                        ->visible(fn($record) => $record->jenis == 'Anak'),
                                 ]),
                                 Forms\Components\DatePicker::make('reservasi_date')
                                     ->minDate(Carbon::now()->format('Y-m-d'))
@@ -115,7 +115,7 @@ class TreatmentResource extends Resource
                             ]),
                         Step::make('Pilih Metode Pembayaran')
                             ->description('Pilih Metode Pembayaran yang Anda Inginkan')
-                            ->schema(fn (Reservation $data) => [
+                            ->schema(fn(Reservation $data) => [
                                 Hidden::make('reservation_id')
                                     ->default($data->id),
                                 Radio::make('name')
@@ -141,7 +141,7 @@ class TreatmentResource extends Resource
                         Step::make('Masukkan Detail Pembayaran')
                             ->description('Masukkan Detail Pembayaran Anda')
                             ->schema(
-                                fn ($record) =>  [
+                                fn($record) =>  [
                                     TextInput::make('rekening_number')
                                         ->label('Rekening Tujuan')
                                         ->readOnly()
@@ -169,6 +169,18 @@ class TreatmentResource extends Resource
                     ])
                     ->color('warning')
                     ->action(function (array $data): void {
+
+                        $reservasiCount = Reservation::whereDate('reservasi_date', $data['reservasi_date'])->count();
+
+                        if ($reservasiCount >= 6) {
+                            Notification::make()
+                                ->title('Tidak bisa melakukan reservasi !')
+                                ->body('Reservasi untuk tanggal tersebut sudah penuh, silakan coba dihari lain.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
                         $reservation = new Reservation();
                         $reservation->baby_name = isset($data['baby_name']) ? $data['baby_name'] : null;
                         $reservation->baby_weight = isset($data['baby_weight']) ? $data['baby_weight'] : null;
