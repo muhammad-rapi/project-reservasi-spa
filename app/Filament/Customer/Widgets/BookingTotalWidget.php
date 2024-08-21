@@ -12,9 +12,9 @@ class BookingTotalWidget extends BaseWidget
     {
         return [
             Stat::make('', 'List Treatment')
-                ->url('admin/treatments'),
+                ->url('customer/treatments'),
             Stat::make('', 'Riwayat Booking')
-                ->url('admin/reservations'),
+                ->url('customer/reservations'),
         ];
     }
 }

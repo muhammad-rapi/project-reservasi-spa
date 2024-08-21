@@ -57,8 +57,9 @@ class TreatmentResource extends Resource
                 Split::make([
                     ImageColumn::make('image')
                         // ->grow(false)
-                        ->width(350)
+                        ->width(250)
                         ->height(200),
+                        // ->size(250),
                     Split::make([
                         Stack::make([
                             TextColumn::make('spa_type')
@@ -76,7 +77,9 @@ class TreatmentResource extends Resource
                         ])
                             ->alignment(Alignment::End),
                     ]),
-                ]),
+                ])
+                ->from('md')
+                ,
                 Stack::make([
                     // TextColumn::make('created_at')
                     //     ->label('Created At')
