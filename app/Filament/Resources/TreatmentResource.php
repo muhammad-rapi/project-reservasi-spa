@@ -25,6 +25,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -60,7 +61,7 @@ class TreatmentResource extends Resource
                     ])
                     ->inline()
                     ->inlineLabel(false),
-                Forms\Components\TextArea::make('manfaat')
+                Textarea::make('manfaat')
                     ->autosize(),
                 Forms\Components\TextInput::make('price')
                     ->rules(['required'])
