@@ -114,7 +114,7 @@ class ReservationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('Upload Bukti Pembayaran')
-                    ->hidden(fn($record): bool => $record->payment->bukti_pembayaran != null)
+                    ->hidden(fn($record): bool => $record->payment && $record->payment->bukti_pembayaran != null)
                     ->form(fn($record) => [
                         Forms\Components\FileUpload::make('bukti_pembayaran')
                             ->label('Upload Bukti Pembayaran')

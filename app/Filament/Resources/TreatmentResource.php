@@ -82,35 +82,32 @@ class TreatmentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->contentGrid([
-                'sm' => 3,
-                'md' => 1,
-                'xl' => 1,
-            ])
             ->columns([
                 Split::make([
                     ImageColumn::make('image')
-                        // ->grow(false)
-                        ->width(350)
+                    // ->grow(false)
+                    ->width(250)
                         ->height(200),
+                    // ->size(250),
                     Split::make([
                         Stack::make([
                             TextColumn::make('spa_type')
-                                ->weight(FontWeight::Bold)
-                                ->description(fn ($record) => $record->jenis)
+                            ->weight(FontWeight::Bold)
+                                ->description(fn($record) => $record->jenis)
                                 ->label('Jenis Spa')
                                 ->searchable(),
                             TextColumn::make('manfaat')
-                                ->weight(FontWeight::Thin)
+                            ->weight(FontWeight::Thin)
                                 ->label('Manfaat Spa'),
                             TextColumn::make('price')
-                                ->weight(FontWeight::Bold)
+                            ->weight(FontWeight::Bold)
                                 ->money('IDR', locale: 'id')
                                 ->sortable(),
                         ])
                             ->alignment(Alignment::End),
                     ]),
-                ]),
+                ])
+                    ->from('md'),
                 Stack::make([
                     // TextColumn::make('created_at')
                     //     ->label('Created At')
@@ -120,7 +117,9 @@ class TreatmentResource extends Resource
                     ->alignment(Alignment::End)
                 // ->visibleFrom('md'),
             ])
-            ->filters([])
+            ->filters([
+                //
+            ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),

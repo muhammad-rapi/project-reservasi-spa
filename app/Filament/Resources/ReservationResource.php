@@ -89,8 +89,11 @@ class ReservationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('Approve')
-                    ->hidden(fn($record): bool => $record->payment->status === Payment::PAID)
+                    ->hidden(fn($record): bool => $record->payment && ($record->payment->status === Payment::PAID || $record->payment->bukti_pembayaran === null))
                     ->form(fn($record) => [
+                        Forms\Components\TextInput::make('amount_of_payments')
+                            ->prefix('Rp. ')
+                            ->label('Nominal Pembayaran'),
                         Forms\Components\TextInput::make('status')
                             ->label('Status Pembayaran'),
                         Forms\Components\TextInput::make('name')
@@ -99,9 +102,10 @@ class ReservationResource extends Resource
                             ->label('Bukti Pembayaran'),
                     ])
                     ->fillForm(fn($record): array => [
-                        'status' => $record->payment->status,
-                        'name' => $record->payment->name,
-                        'bukti_pembayaran' => $record->payment->bukti_pembayaran,
+                        'amount_of_payments' => $record->payment ? $record->payment->amount_of_payments : null,
+                        'status' => $record->payment ? $record->payment->status : null,
+                        'name' => $record->payment ? $record->payment->name : null,
+                        'bukti_pembayaran' => $record->payment ?  $record->payment->bukti_pembayaran : null,
                     ])
                     ->disabledForm()
                     ->color('warning')

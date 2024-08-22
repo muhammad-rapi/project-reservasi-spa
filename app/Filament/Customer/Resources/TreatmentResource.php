@@ -48,11 +48,6 @@ class TreatmentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->contentGrid([
-                'sm' => 3,
-                'md' => 1,
-                'xl' => 1,
-            ])
             ->columns([
                 Split::make([
                     ImageColumn::make('image')
